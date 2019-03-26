@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: apis4lawenforcementingress
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.frontend.rule.type: PathPrefixStrip
+  namespace: apis4lawenforcement      
+spec:
+  rules:
+  - host:
+    http:
+      paths:
+      - path: /apis4lawenforcement
+        backend:
+          serviceName: apis4lawenforcementervice
+          servicePort: http

@@ -1,0 +1,950 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: "APIs 4 SAPOL Demo"
+  description: SAPol provides a simple API allowing consumers to view people, license, vehicle and property info.
+  #license:
+  #  name: MIT
+  #  url: https://github.com/apiaryio/polls-api/blob/master/LICENSE
+tags:
+- name: "Tasks"
+  description: "People who SAPOL interact with in the field using a mobile application."
+  externalDocs:
+    description: "Find out more"
+    url: "http://apismadeeasy.cloud"
+- name: "Persons Of Interest"
+  description: "People who SAPOL interact with in the field using a mobile application."
+  externalDocs:
+    description: "Find out more"
+    url: "http://apismadeeasy.cloud"
+- name: "Licenses"
+  description: " License information / current status."
+  externalDocs:
+    description: "Find out more"
+    url: "http://apismadeeasy.cloud"
+- name: "Vehicles"
+  description: " Vehicle Information / current status."
+  externalDocs:
+    description: "Find out more"
+    url: "http://apismadeeasy.cloud"
+- name: "Officers"
+  description: " Police Officer Lookup / Information."
+  externalDocs:
+    description: "Find out more"
+    url: "http://apismadeeasy.cloud"
+- name: "Stolen Property"
+  description: " Stolen Property information / current status."
+  externalDocs:
+    description: "Find out more"
+    url: "http://apismadeeasy.cloud"
+basePath: "/"
+host: "localhost:3000"
+#basePath: "/sapol/"
+schemes:
+- http
+security:
+  - X-MyAPI-Key: []
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /tasks:
+    x-summary: Tasks 
+    post:
+      tags: 
+      - "Tasks"
+      description: >-
+        Create a Task representing a scope of work to be actioned. It may or may not be assigned to a Police Officer on createion. The assignment may be done later
+      summary: Create a Task
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            properties:
+              Task:
+                $ref: '#/definitions/TaskRequest'
+      responses:
+        201:
+          description: 'Successfully created Task Record'
+          schema:
+            properties:
+              Task:
+                $ref: '#/definitions/TaskResponse'
+          examples:
+            application/json:
+              Task:
+                taskId: 1
+                taskName: 'Serve Summons to appear Ref ABC-1234 to Mr Craig Smith'
+                taskDescription: 'Serve Summons to appear Ref ABC-1234 to Mr Craig Smith of 20 Charlesworthnut Street, Walkerville, SA 5000'
+                taskLocation: '20 Charlesworthnut Street, Walkerville, SA 5000'
+                taskStatus: 'In progress'
+                taskStatusUpdateDate : '12-DEC-2018'
+                lsa: 'Salisbury'
+                officerAssignedToTask: '12345'
+                officerAssignedDate: '12-DEC-2018'
+                vixenBadgeId: '77777'
+
+    get:
+      tags: 
+      - "Tasks"
+      summary: "Get a List of All Tasks"
+      description: "returns a list of tasks "
+      operationId: "getTaskInfo"
+      produces:
+        - "application/json"
+      parameters:
+      - name: "badgeId"
+        in: "query"
+        description: "Enter a valid badgeId for an officer"
+        required: false
+        type: "string"
+        x-example: 'A12345'
+      - name: "lsa"
+        in: "query"
+        description: "Enter value of local service area eg Adelaide"
+        required: false
+        type: "string"
+        x-example: 'Adelaide'
+      responses:
+        200:
+          description: Successful Task Lookup Response
+          schema:
+            properties:
+              Tasks:
+                type: array
+                items:
+                  $ref: '#/definitions/TaskResponse'
+          examples:
+            application/json:
+              Tasks:
+                - taskId: 1
+                  taskName: 'Serve Summons to appear Ref ABC-1234 to Mr Craig Smith'
+                  taskDescription: 'Serve Summons to appear Ref ABC-1234 to Mr Craig Smith of 20 Charlesworthnut Street, Walkerville, SA 5000'
+                  taskLocation: '20 Charlesworthnut Street, Walkerville, SA 5000'
+                  taskStatus: 'In progress'
+                  taskStatusUpdateDate : '12-DEC-2018'
+                  las: 'Salisbury'
+                  officerAssignedToTask: '12345'
+                  officerAssignedDate: '12-DEC-2018'
+                  vixenBadgeId: '77777'
+                - taskId: 2
+                  taskName: 'Interview Ms Sharon Smith'
+                  taskDescription: 'Interview Ms Sharon Smith of 9 Ann Street, Salisbury, SA 5018 re stolen property - crime ref A3333'
+                  taskLocation: '9 Ann Street, Salisbury, SA 5000'
+                  taskStatus: 'Assigned'
+                  taskStatusUpdateDate : '12-DEC-2018'
+                  lsa: 'Salisbury'
+                  officerAssignedToTask: '12345'
+                  officerAssignedDate: '12-DEC-2018'
+                  vixenBadgeId: '77777'
+                - taskId: 3
+                  taskName: 'Arrest Mike Downer'
+                  taskDescription: 'Arrest Mr Mike Downer of 32 Owen Street, Salisbury Downs, SA 5019 re Serious Assualt - crime ref A44444'
+                  taskLocation: '32 Owen Street, Salisbury Downs, SA 5109'
+                  taskStatus: 'Created'
+                  taskStatusUpdateDate : '12-JAN-2019'
+                  lsa: 'Salisbury'
+                  officerAssignedToTask: '' 
+                  officerAssignedDate: ''
+                  vixenBadgeId: '77777'
+                - taskId: 4
+                  taskName: 'Arrest Peter Pan'
+                  taskDescription: 'Arrest Mr Peter Pan 25 Grenfell Street, Adelaide, SA 5000 re Serious Assualt - crime ref A44444'
+                  taskLocation: '25 Grenfell Street, Adelaide, SA 5000'
+                  taskStatus: 'Created'
+                  taskStatusUpdateDate : '13-JAN-2019'
+                  lsa: 'Adelaide'
+                  officerAssignedToTask: '' 
+                  officerAssignedDate: ''
+                  vixenBadgeId: '88888'                
+
+  /tasks/{taskId}:
+    put:
+      tags: 
+      - "Tasks"
+      summary: "Update Task Details"
+      description: "Updates a single Task"
+      operationId: "updateTaskByTaskId"
+      produces:
+      - "application/json"
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          type: number
+          x-example: 27
+        - name: body
+          in: body
+          required: true
+          schema:
+            properties:
+              Task:
+                $ref: '#/definitions/TaskRequest'
+      responses:
+        201:
+          description: 'Successfully updated Task Information'
+          schema:
+            $ref: '#/definitions/TaskResponse'
+          examples:
+            application/json:
+                taskId: 99
+                taskName: 'Record Victim of Crime Statement for Court Case - Ms Sally Nyugen - Ref CA1245'
+                taskDescription: 'Interview Ms Sally Nguyen of 30 Waterloo Corner Road, Salisbury, SA 5018 re stolen property - crime ref A3333'
+                officerAssignedToTask: '12345'
+                officerAssignedDate: '12-DEC-2018'
+                taskLocation: '9 Ann Street, Salisbury, SA 5000'
+                taskStatus: 'Completed'
+                taskLastUpdatedDate: '12-DEC-2018'
+                lsa: 'Salisbury'
+                vixenBadgeId: '77777'
+                
+  /poi:
+    x-summary: Persons of Interest 
+    post:
+      tags:
+      - "Persons Of Interest"
+      description: 'Create a Person of Interest record.'
+      summary: 'Register a Person of Interest / Contact Information' 
+      parameters:  
+        - name: body
+          in: body
+          required: true
+          schema:
+            properties:
+              PersonOfInterest:
+                $ref: '#/definitions/PersonsOfInterestRequest'
+      responses:
+        201:
+          description: 'Successfully created Person Of Interest record. It is assumed that the database will auto-generate the ID'
+          schema:
+            properties:
+              PersonOfInterest:
+                $ref: '#/definitions/PersonsOfInterestResponse'
+          examples:
+            application/json:
+              PersonOfInterest:
+                id: 1
+                fname: 'Dave'
+                lname: 'Redbull'
+                dob: '01-JAN-1980'
+                address: '20 Charlesworthnut Street, Walkerville, SA 5000'
+                facialImageURL: '/foo/image/123.jpg'
+                licenseNumber: 'A12345'
+                criminalHistorySummary: 'hardened criminal'
+                hasWarrantsOutstanding: 'YES'
+                hasFinesOutstanding: 'YES'
+              
+    get:
+      tags:
+      - "Persons Of Interest"
+      summary: "List containing Persons of Interest Details filtered by parameters provided"
+      description: "List containing Persons of Interest Details filtered by parameters provided"
+      operationId: "getPersonsOfInterest"
+      produces:
+        - "application/json"
+      parameters:
+      - name: "firstName"
+        in: "query"
+        description: "firstName of the contact used to filter the record(s) to be returned."
+        required: false
+        type: "string"
+        x-example: 'Dave'
+      - name: "lastName"
+        in: "query"
+        description: "lastName of the contact used to filter the record(s) to be returned."
+        required: false
+        type: "string"
+        x-example: 'Redbull'
+      - name: "dateOfBirth"
+        in: "query"
+        description: "date of birth of the contact used to filter the record(s) to be returned."
+        required: false
+        type: "string"
+        x-example: '01-JAN-1980'
+      responses:
+        200:
+          description: Successful Task Lookup Response
+          schema:
+            properties:
+              PersonsOfInterest:
+                type: array
+                items:
+                  $ref: '#/definitions/PersonsOfInterestResponse'
+          examples:
+            application/json:
+              PersonsOfInterest:
+              - id: 1
+                fname: 'Dave'
+                lname: 'Redbull'
+                dob: '01-JAN-1980'
+                address: '20 Charlesworthnut Street, Walkerville, SA 5000'
+                facialImageURL: '/foo/image/123.jpg'
+                licenseNumber: 'A12345'
+                criminalHistorySummary: 'x'
+                hasWarrantsOutstanding: 'YES'
+                hasFinesOutstanding: 'YES'
+              - id: 2
+                fname: 'Daniel'
+                lname: 'Truedea'
+                dob: '01-JAN-1980'
+                address: '1 Hindley Street, Adelaide, SA 5000'
+                facialImageURL: '/foo/image/243.jpg'
+                licenseNumber: 'A54632'
+                criminalHistorySummary: 'Handle with extreme care. Prone to verbal spray, spitting and violent outbursts.'
+                hasWarrantsOutstanding: 'NO'
+                hasFinesOutstanding: 'YES'
+                
+  /poi/{personId}:
+    put:
+      tags:
+      - "Persons Of Interest"
+      summary: 'Update the details of a Person of Interest'
+      description: 'Update a contact within the Police Citizen database.'
+      operationId: "updatePersonOfInterestById"
+      produces:
+      - "application/json"
+      parameters:
+        - name: 'personId'
+          in: path
+          required: true
+          type: number
+          x-example: 1
+        - name: body
+          in: body
+          required: true
+          schema:
+            properties:
+              PersonOfInterest:
+                $ref: '#/definitions/PersonsOfInterestRequest'
+      responses:
+        201:
+          description: 'Successful update of Persons Of Interest information'
+          schema:
+            $ref: '#/definitions/PersonsOfInterestResponse'
+          examples:
+            application/json:
+              PersonOfInterest:
+                id: 1
+                fname: 'Dave'
+                lname: 'Redbull'
+                dob: '01-JAN-1980'
+                address: '20 Charlesworthnut Street, Walkerville, SA 5000'
+                facialImageURL: '/foo/image/123.jpg'
+                licenseNumber: 'A12345'
+                license_class: 'B'
+                licenseExpiryDate: '02-MAR-2020'
+                criminalHistorySummary: 'Dave was named a person of interest by the coroner re case ACC555'
+                hasWarrantsOutstanding: ''
+                hasFinesOutstanding: 'Yes'
+
+  /licenses:
+    get:
+      tags: 
+      - "Licenses"
+      summary: List All License Details for Person
+      description: "Returns a single Task"
+      operationId: "getLicenseDetailsForPerson"
+      produces:
+      - "application/json"
+      x-summary: License Details
+      parameters:
+      - name: "firstName"
+        in: "query"
+        description: "firstName of the contact used to filter the record(s) to be returned."
+        required: true
+        type: "string"
+        x-example: 'Dave'
+      - name: "lastName"
+        in: "query"
+        description: "lastName of the contact used to filter the record(s) to be returned."
+        required: true
+        type: "string"
+        x-example: 'Beckam'
+      - name: "dateOfBirth"
+        in: "query"
+        description: "date of birth of the contact used to filter the record(s) to be returned."
+        required: true
+        type: "string"
+        x-example: '01-JAN-1960'
+      responses:
+        200:
+          description: Successful Task Lookup Response
+          schema:
+            properties:
+              Licenses:
+                type: array
+                items:
+                  $ref: '#/definitions/LicenseResponse'
+          examples:
+            application/json:
+              Licenses:
+              - fname: 'Dave'
+                lname: 'Backam'
+                dob: '01-JAN-1960'
+                address: '30 Plane Tree Drive, Craigmore, SA 5114'
+                license_number: 'A45454'
+                license_class: 'C'
+                licenseExpiryDate: '12-DEC-2019'
+              - fname: 'Dave'
+                lname: 'Beckam'
+                dob: '01-JAN-1960'
+                address: '30 Plane Tree Drive, Craigmore, SA 5114'
+                license_number: 'A55122'
+                license_class: 'B'
+                licenseExpiryDate: '02-MAR-2020'
+
+  /officers:
+    x-summary: Officer Lookup 
+    get:
+      tags: 
+      - "Officers"
+      summary: Police Officer Details
+      description: "Returns information for a single Police Officer"
+      operationId: "getDetailsForOfficer"
+      produces:
+      - "application/json"
+      x-summary: Officer Details
+      parameters:
+      - name: "fname"
+        in: "query"
+        description: "firstName of the contact used to filter the record(s) to be returned."
+        required: false
+        type: "string"
+        x-example: 'Dave'
+      - name: "lname"
+        in: "query"
+        description: "lastName of the contact used to filter the record(s) to be returned."
+        required: false
+        type: "string"
+        x-example: 'Smith'
+      - name: "dob"
+        in: "query"
+        description: "date of birth of the contact used to filter the record(s) to be returned."
+        required: false
+        type: "string"
+        x-example: '12-DEC-1980'
+      responses:
+        200:
+          description: Successful Task Lookup Response
+          schema:
+            properties:
+              Officers:
+                type: array
+                items:
+                  $ref: '#/definitions/PoliceOfficerResponse'
+          examples:
+            application/json:
+              Officers:
+                fname: 'Dave'
+                lname: 'Redbull'
+                dob: '12-JUN-1980'
+                address: '20 Charlesworthnut Street, Walkerville, SA, 5000'
+                addresslat: -34.778011
+                addresslong: 138.667145
+                badgeId: 'A12345'
+                rank: 'Police Constable'
+                assignedToLSA: 'Adelaide'
+
+  /officers/{badgeId}:
+    put:
+      tags:
+      - "Officers"
+      summary: 'Update the details of an Officer'
+      description: 'Update Officer details eg assign to new LSA.'
+      operationId: "updateOfficerByBadgeId"
+      produces:
+      - "application/json"
+      parameters:
+        - name: 'badgeId'
+          in: path
+          required: true
+          type: string
+          x-example: 'B99999'
+        - name: body
+          in: body
+          required: true
+          schema:
+            properties:
+              PoliceOfficer:
+                $ref: '#/definitions/PoliceOfficerRequest'
+      responses:
+        201:
+          description: 'Successful update of Officer Information'
+          schema:
+            $ref: '#/definitions/PoliceOfficerResponse'
+          examples:
+            application/json:
+              PoliceOfficer:
+                id: 1
+                fname: 'Dave'
+                lname: 'Redbull'
+                dob: '01-JAN-1980'
+                address: '20 Charlesworthnut Street, Walkerville, SA 5000'
+                addresslat: -34.778011
+                addresslong: 138.667145
+                badgeId: 'A12345'
+                rank: 'Police Constable'
+                assignedToLSA: 'Adelaide'
+
+  /vehicles:
+    x-summary: Vehicle Search 
+    get:
+      tags: 
+      - "Vehicles"
+      summary: List Vehicle Details 
+      parameters:
+      - name: "licensePlateNumber"
+        in: "query"
+        description: "the licenseplate of a vehicle"
+        required: false
+        type: "string"
+        x-example: 'A333-ATV'
+      - name: "registeredOwner"
+        in: "query"
+        description: "Enter the name of the registered owner"
+        required: false
+        type: "string"
+        x-example: 'Mr Don Dundas'
+      - name: "registeredOwnerAddress"
+        in: "query"
+        description: "Enter the address of the registered owner"
+        required: false
+        type: "string"
+        x-example: '10 Thames Crescent, Salisbury East, SA, 5109'
+      responses:
+        200:
+          description: Successful Vehicle Lookup Response
+          schema:
+            properties:
+              Vehicles:
+                type: array
+                items:
+                  $ref: '#/definitions/VehicleResponse'
+          examples:
+            application/json:
+              Vehicles:
+              - licensePlateNumber: 'A333-ATV'
+                make: 'Mazda'
+                model: 'CX-5'
+                requiresLicenseClass: 'C'
+                registrationStatus: 'Registered'
+                registrationExpiryDate: '10-APR-2019'
+                registeredOwner: 'Mr Don Dundas'
+                registeredOwnerAddress: '10 Thames Crescent, Salisbury East, SA, 5109'
+
+  /stolenproperty:
+    x-summary: Stolen Property Search
+    get:
+      tags: 
+      - "Stolen Property"
+      summary: List Stolen Property Details 
+      parameters:
+      - name: "searchCriteria1"
+        in: "query"
+        description: "the text to use as search criteria within an item Description "
+        required: true
+        type: "string"
+        x-example: 'Chronograph'
+      - name: "searchCriteria2"
+        in: "query"
+        description: "the text to use as search criteria within an item Description "
+        required: false
+        type: "string"
+        x-example: 'Watch'
+      - name: "searchCriteria3"
+        in: "query"
+        description: "the text to use as search criteria within an item Description "
+        required: false
+        type: "string"
+        x-example: 'Seiko'
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/StolenPropertyResponse'
+          examples:
+            application/json:
+              StolenProperty:
+              - name: 'Watch'
+                description: 'Mens, Seiko Chronograph Watch, silver strap, blue face'
+
+securityDefinitions:
+  X-MyAPI-Key:
+    type: "apiKey"
+    name: "x-api-key"
+    in: "header"
+    
+definitions:
+  TaskRequest:
+    title: "Task Request"
+    type: "object"
+    required:
+    - "taskName"
+    - "taskDescription"
+    properties:
+      taskName:
+        type: string
+        example: 'Serve Summons'
+      taskDescription:
+        type: string
+        example: 'Detailed description of the task'
+      officerAssignedToTask:
+        type: string
+        example: 'A12345'
+      officerAssignedDate:
+        type: string
+        example: '20-JAN-2018'
+      taskLocation:
+        type: string
+        example: 'Goodwood, SA'
+      taskStatus:
+        type: string
+        example: 'Open'
+      taskLastUpdatedDate:
+        type: string
+        example: '20-FEB-2018'
+      lsa:
+        type: string
+        example: 'Adelaide'
+      vixenBadgeId:
+        type: string
+        example: 'A77777'
+
+  TaskResponse:
+    title: "Task Response"
+    type: object
+    properties:
+      taskId: 
+        type: number
+        example: 1
+      taskName:
+        type: string
+        example: 'Serve Summons'
+      taskDescription:
+        type: string
+        default: 'Detailed description of the task'
+      officerAssignedToTask:
+        type: string
+        example: 'A12345'
+      officerAssignedDate:
+        type: string
+        example: '20-JAN-2018'
+      taskLocation:
+        type: string
+        example: 'Goodwood, SA'
+      taskStatus:
+        type: string
+        example: 'Open'
+      taskLastUpdatedDate:
+        type: string
+        example: '20-FEB-2018'
+      lsa:
+        type: string
+        example: 'Adelaide'
+      vixenBadgeId:
+        type: string
+        example: 'A77777'
+        
+  PoliceOfficerRequest:
+    title: "Police Officer Request"
+    required:
+    - "fname"
+    - "lname"
+    - "badgeId"
+    type: object
+    properties:
+      fname:
+        type: string
+        example: 'Michael'
+      lname:
+        type: string
+        example: 'Mouse'
+      dob:
+        type: string
+        example: '01-JAN-2001'
+      address:
+        type: string
+        example: 'No Fixed Address'
+      addresslat:
+        type: number
+        example: -34.959247
+      addresslong:
+        type: number
+        example: 138.638071
+      badgeId:
+        type: string
+        example: 'B99988'
+      rank:
+        type: string
+        example: 'Police Constable'
+      assignedtoLSA:
+        type: string
+        example: 'Adelaide'
+
+  PoliceOfficerResponse:
+    title: "Police Officer Response"
+    type: object
+    properties:
+      fname:
+        type: string
+        example: 'Michael'
+      lname:
+        type: string
+        example: 'Mouse'
+      dob:
+        type: string
+        example: '01-JAN-2001'
+      address:
+        type: string
+        example: 'No Fixed Address'
+      addresslat:
+        type: number
+        example: -34.959247
+      addresslong:
+        type: number
+        example: 138.638071
+      badgeId:
+        type: string
+        example: 'B99988'
+      rank:
+        type: string
+        example: 'Police Constable'
+      assignedtoLSA:
+        type: string
+        example: 'Adelaide'
+
+  PersonsOfInterestRequest:
+    title: "Persons Of Interest Request"
+    type: object
+    required:
+    - "fname"
+    - "lname"
+    - "address"
+    - "dob"
+    properties:
+      fname:
+        type: string
+        example: 'Dave'
+      lname:
+        type: string
+        example: 'Dundocerty'
+      dob:
+        type: string
+        example: '19-MAR-2000'
+      address:
+        type: string
+        example: '25 Grenfell Street, Adelaide, SA , 5000'
+      facialImageURL:
+        type: string
+        example: '/foo/images/img001.jpg'
+      licenseNumber:
+        type: string
+        example: 'SAV-00001'
+      criminalHistorySummary:
+        type: string
+        example: 'Very dangerous. Approach with caution.. Multiple aliases. Long criminal history'
+      hasWarrantsOutstanding:
+        type: string
+        example: 'YES'
+      hasFinesOutstanding:
+        type: string
+        example: 'NO'        
+
+  PersonsOfInterestResponse:
+    title: "Persons Of Interest Response"
+    type: object
+    properties:
+      id:
+        type: number
+        default: 1
+      fname:
+        type: string
+        default: 'Dave'
+      lname:
+        type: string
+        default: 'Dundocerty'
+      dob:
+        type: string
+        default: '19-MAR-2000'
+      address:
+        type: string
+        default: '25 Grenfell Street, Adelaide, SA , 5000'
+      facialImageURL:
+        type: string
+        default: '/foo/images/img001.jpg'
+      licenseNumber:
+        type: string
+        default: 'SAV-00001'
+      criminalHistorySummary:
+        type: string
+        default: 'Very dangerous. Approach with caution.. Multiple aliases. Long criminal history'
+      hasWarrantsOutstanding:
+        type: string
+        default: 'YES'
+      hasFinesOutstanding:
+        type: string
+        default: 'NO'   
+
+  LicenseRequest:
+    title: "License Request"
+    type: object
+    properties:
+      license_number:
+        type: string
+        example: 'A60032'
+      license_class:
+        type: string
+        example: 'C'
+      licenseExpiryDate:
+        type: string
+        example: '12-FEB-2019'
+      fname:
+        type: string
+        example: 'Dave'
+      lname:
+        type: string
+        example: 'Beckam'
+      dob:
+        type: string
+        example: '01-JAN-1960'
+      address:
+        type: string
+        example: '30 Plane Tree Drive, Craigmore, SA 5114'
+
+  LicenseResponse:
+    title: "License Response"
+    type: object
+    properties:
+      license_number:
+        type: string
+        example: 'A45454'
+      license_class:
+        type: string
+        example: 'C'
+      licenseExpiryDate:
+        type: string
+        example: '12-DEC-2019'
+      fname:
+        type: string
+        example: 'Dave'
+      lname:
+        type: string
+        example: 'Beckam'
+      dob:
+        type: string
+        example: '01-JAN-1960'
+      address:
+        type: string
+        example: '30 Plane Tree Drive, Craigmore, SA 5114'
+      address_lat:
+        type: number
+        example: -34.71421
+      address_long:
+        type: number
+        example: 138.70706
+
+  VehicleRequest:
+    title: "Vehicle Request"
+    type: object
+    properties:
+      licensePlateNumber:
+        type: string
+        example: 'S333-ATV'
+      vehicleMake:
+        type: string
+        example: 'Mazda'
+      vehicleModel:
+        type: string
+        example: 'CX-5'
+      requiresLicenseClass:
+        type: string
+        example: 'C'
+      registrationStatus: 
+        type: string
+        example: 'UNREGISTERED'
+      registrationExpiryDate: 
+        type: string
+        example: '12-DEC-2018'
+      registeredOwner:
+        type: string
+        example: 'Mr Don Dundas'
+      registeredOwnerAddress:
+        type: string
+        example: '32 Angas Street, Adelaide, SA, 5000'
+        
+  VehicleResponse:
+    title: "Vehicle Response"
+    type: object
+    properties:
+      licensePlateNumber:
+        type: string
+        example: 'S333-BUU'
+      vehicleMake:
+        type: string
+        example: 'Mazda'
+      vehicleModel:
+        type: string
+        example: 'CX-5'
+      requiresLicenseClass:
+        type: string
+        example: 'C'
+      registrationStatus: 
+        type: string
+        example: 'UNREGISTERED'
+      registrationExpiryDate: 
+        type: string
+        example: '12-DEC-2018'
+      registeredOwner:
+        type: string
+        example: 'Mr David Jones'
+      registeredOwnerAddress:
+        type: string
+        example: '32 Angas Street, Adelaide, SA, 5000'
+
+  StolenPropertyRequest:
+    title: "Stolen Property Request"
+    type: object
+    properties:
+      itemName:
+        type: string
+        example: 'Mens Watch'
+      itemDescription:
+        type: string
+        example: 'Mens Seiko Watch, Chronograph, Blue Face, Gold and Silver Wrist Band'
+      itemImageURL:
+        type: string
+        example: '/foo/images/p_img_0001.jpg'
+
+  StolenPropertyResponse:
+    title: "Stolen Property Response"
+    type: object
+    properties:
+      itemId:
+        type: number
+        example: 1
+      itemName:
+        type: string
+        example: 'Seiko Watch'
+      itemDescription:
+        type: string
+        default: 'Mens Seiko Chronograph Watch White Face'
+      itemImageURL:
+        type: string
+        example: '/foo/images/p_img_0001.jpg'
+      itemOwner:
+        type: string
+        example: 'Mrs Julie Jones'
+      itemAdress:
+        type: string
+        example: '10 Thames Crescent, Salisbury East, SA 5109'
+      itemAddress_Lat:
+        type: number
+        example: -34.77595
+      itemAddress_Long:
+        type: number
+        example: 138.67296
+      

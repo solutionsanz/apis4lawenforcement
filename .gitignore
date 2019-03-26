@@ -1,0 +1,59 @@
+.vagrant/
+ssh/
+terraform.tfvars
+terraform.tfstate*
+crash.log
+node_modules/
+npm-debug.log
+
+setEnv.sh
+d.zip
+client_secret.json
+client_access_token.json
+temp_*
+deployment.json
+docs
+apip
+
+oradbInstantClient/
+
+npm-debug.log
+setEnv
+temp_*
+*-dpl.yaml
+deploy.sh
+
+
+# Customer Furnished Datafiles #
+################################
+/datafiles/*.csv
+/w_datafiles/*.csv
+
+# Client Credential Wallet Files #
+# ###############################
+cwallet.sso
+ewallet.p12
+keystore.jks
+ojdbc.properties
+sqlnet.ora
+tnsnames.ora
+truststore.jks
+
+# Packages #
+############
+*.zip
+*.7z
+
+# Log Files #
+#############
+/loaderscripts/*.log
+/loaderscripts/*.bad
+
+# Database Files #
+##################
+#
+
+#Compiled Source #
+#*.com
+#*.class
+
