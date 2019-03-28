@@ -26,8 +26,8 @@ var app = express();
 // var db = monk(MONGODB_CREDENTIALS + config.MONGODB_SERVER + ':' + config.MONGODB_PORT + '/api4saasdemo');
 
 // Converting YAML into JSON for Swagger UI loading purposes:
-var inputfile = 'apis4sapol_swaggerdef.yml',
-    outputfile = 'apis4sapol_swaggerdef.json';
+var inputfile = 'apis4lawenforcement_swaggerdef.yml',
+    outputfile = 'apis4lawenforcement_swaggerdef.json';
 
 swaggerFileDef = yaml.load(fs.readFileSync(inputfile, {
     encoding: 'utf-8'

@@ -1,0 +1,44 @@
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: apis4lawenforcementdeployment
+  labels:
+    app: apis4lawenforcement
+    microservice: app
+  namespace: apis4lawenforcement
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: apis4lawenforcement
+      microservice: app
+  template:
+    metadata:
+      labels:
+        app: apis4lawenforcement
+        microservice: app
+        version: v0.0.1
+    spec:
+      containers:
+      - name: apis4lawenforcement
+        image: ENTER_IMAGE_TAG_NAME_HERE
+        env:
+        - name: API_GW_ENABLED
+          value: "true"
+        - name: API_GW_SERVER
+          value: "lbaas.xxxx.xxx"
+        - name: API_GW_BASEURL
+          value: "/apis4lawenforcement"
+        - name: NODE_ORACLEDB_USER
+          value: "XXXXX"
+        - name: NODE_ORACLEDB_PASSWORD
+          value: "XXXXXX"
+        - name: NODE_ORACLEDB_CONNECTIONSTRING
+          value: "XXXX_medium"   
+        - name: PORT
+          value: "3000"             
+        ports:
+        - containerPort: 3000
+      imagePullSecrets:
+      - name: ocir-reg
